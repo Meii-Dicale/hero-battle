@@ -1,6 +1,6 @@
 <template>
-  <v-dialog :model-value="modelValue" max-width="700" persistent @update:model-value="$emit('update:modelValue', $event)">
-    <v-card>
+  <v-dialog :model-value="modelValue" max-width="700" persistent class="combat-dialog" @update:model-value="$emit('update:modelValue', $event)">
+    <v-card class="combat-modal-card">
       <v-card-title class="text-center">Combat</v-card-title>
       <v-divider />
       <div v-if="heroStore.firstHero && heroStore.secondHero" class="combatants">
@@ -64,6 +64,28 @@ function startCombat() {
 </script>
 
 <style scoped>
+/* Effet verre dépoli sur la modale combat */
+:deep(.combat-modal-card),
+.combat-modal-card {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+:deep(.combat-modal-card .v-card-title),
+:deep(.combat-modal-card .v-card-actions) {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+:deep(.combat-modal-card .v-divider) {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 .combatants {
   display: flex;
   align-items: stretch;
@@ -90,6 +112,7 @@ function startCombat() {
   font-weight: 700;
   margin: 0;
   text-align: center;
+  color: rgba(255, 255, 255, 0.95);
 }
 .vs {
   font-size: 1.5rem;

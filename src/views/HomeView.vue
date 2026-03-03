@@ -1,23 +1,25 @@
 
 
 <template>
-  <main>
+  <main class="home-main">
     <StatisticsBattle />
     <div v-if="heroStore.loading" class="loading">
       <p>Chargement des héros...</p>
     </div>
     <template v-else>
-      <div class="hero-grid">
+      <div class="hero-grid mt-10">
         <v-card
           v-for="hero in heroStore.heroes"
           :key="hero.id"
           class="hero-card"
           hover
         >
-          <v-card-title>
-            <h2>{{ hero.name }}</h2>
-          </v-card-title>
-          <v-img v-if="hero.image?.url" :src="hero.image.url" cover />
+          <div class="hero-card-clickable  " @click="selectedHero = hero">
+            <v-card-title>
+              <h2>{{ hero.name }}</h2>
+            </v-card-title>
+            <v-img v-if="hero.image?.url" :src="hero.image.url" cover />
+          </div>
           <v-card-actions class="hero-actions">
             <v-btn size="small" variant="flat" color="primary" @click="heroStore.setFirstHero(hero)">
               J1
@@ -37,11 +39,14 @@
         Tous les héros sont chargés.
       </p>
     </template>
+    <HeroDetailModal :hero="selectedHero" @close="selectedHero = null" />
     <StickyHeroBar />
   </main>
 </template>
 
 <script setup lang="ts">
+import type { Hero } from '@/types/heroTypes'
+import HeroDetailModal from '@/components/HeroDetailModal.vue'
 import StatisticsBattle from '@/components/StatisticsBattle.vue'
 import StickyHeroBar from '@/components/StickyHeroBar.vue'
 import { useHeroStore } from '@/stores/heroStore'
@@ -49,9 +54,12 @@ import { onMounted, ref, watch } from 'vue'
 
 const heroStore = useHeroStore()
 const sentinelRef = ref<HTMLElement | null>(null)
+const selectedHero = ref<Hero | null>(null)
 
 onMounted(async () => {
-  await heroStore.getHeroes()
+  if (heroStore.heroes.length === 0) {
+    await heroStore.getHeroes()
+  }
 })
 
 onMounted(() => {
@@ -78,6 +86,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.home-main {
+  padding-top: 56px;
+  padding-bottom: 120px;
+  min-height: 100vh;
+}
 .hero-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -85,18 +98,43 @@ onMounted(() => {
   gap: 1rem;
   padding: 1rem 0;
 }
+/* Effet verre dépoli sur les cartes + couche GPU pour éviter bugs d'affichage au scroll */
 .hero-card {
   min-height: 0;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateZ(0);
+}
+.hero-card:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.hero-card-clickable {
+  cursor: pointer;
 }
 .hero-actions {
   padding: 0.5rem;
   gap: 0.5rem;
   justify-content: center;
+  background: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .hero-card :deep(.v-card-title) {
   font-size: 0.9rem;
   padding: 0.5rem;
   word-break: break-word;
+  color: white;
+  background: transparent !important;
 }
 .hero-card :deep(.v-img) {
   aspect-ratio: 1;

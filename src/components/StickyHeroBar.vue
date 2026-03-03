@@ -74,6 +74,7 @@ const showCombatModal = ref(false)
 </script>
 
 <style scoped>
+/* Effet verre dépoli */
 .sticky-hero-bar {
   position: fixed;
   bottom: 0;
@@ -84,14 +85,18 @@ const showCombatModal = ref(false)
   justify-content: center;
   gap: 2rem;
   padding: 1rem 1.5rem;
-  background-color: #fff;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  color: white;
 }
 
 .placeholder {
   margin: 0;
-  color: #666;
+  color: white;
   font-size: 1rem;
 }
 
@@ -128,7 +133,7 @@ const showCombatModal = ref(false)
 
 .slot-placeholder {
   margin: 0;
-  color: #999;
+  color: white;
   font-size: 0.9rem;
 }
 

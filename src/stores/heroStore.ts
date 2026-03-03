@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Battle, Hero } from '../types/heroTypes'
+import type {
+  ApiHeroResponse,
+  Battle,
+  Hero,
+  Biography,
+  Appearance,
+  Work,
+  Connections,
+} from '../types/heroTypes'
 import { getBattleStats } from '@/utils/battleRules'
 import api from '@/service/ApiService'
 
@@ -30,12 +38,6 @@ export const useHeroStore = defineStore('hero', () => {
     return heroes.value[randomIndex]
   }
 
-  /**
-   * Lance le combat tour par tour. Le héros avec la vitesse la plus élevée commence.
-   * En cas d'égalité, firstHero commence.
-   * Dégâts = max(1, attaque_attaquant - défense_défenseur/2).
-   * Met à jour winner, loser, combatLog et ajoute à historyBattles.
-   */
   function runCombat() {
     const heroA = firstHero.value
     const heroB = secondHero.value
@@ -95,7 +97,7 @@ export const useHeroStore = defineStore('hero', () => {
     const results = await Promise.allSettled(
       Array.from({ length: count }, (_, i) =>
         api.get(`/${start + i}`).then((res) =>
-          normalizeHero(res.data as Record<string, unknown>)
+          normalizeHero(res.data as ApiHeroResponse)
         )
       )
     )
@@ -104,10 +106,9 @@ export const useHeroStore = defineStore('hero', () => {
     return batch.filter((h) => h.name || h.image.url)
   }
 
-  function normalizeHero(raw: Record<string, unknown>): Hero {
-    const image = raw.image
-    const ps = raw.powerstats as Record<string, unknown> | undefined
-    const num = (v: unknown) => (typeof v === 'string' ? parseInt(v, 10) : Number(v)) || 0
+  function normalizeHero(raw: ApiHeroResponse): Hero {
+    const num = (v: string) => parseInt(v, 10) || 0
+    const ps = raw.powerstats
     const powerstats: Hero['powerstats'] = ps
       ? {
           intelligence: num(ps.intelligence),
@@ -125,13 +126,56 @@ export const useHeroStore = defineStore('hero', () => {
           power: 0,
           combat: 0,
         }
-    const name = String(raw.name ?? '')
-    const imageUrl = typeof image === 'string' ? image : (image as { url?: string })?.url ?? ''
+
+    const name = raw.name ?? ''
+    const imageUrl = raw.image?.url ?? ''
+
+    const biography: Biography | undefined = raw.biography
+      ? {
+          'full-name': raw.biography['full-name'] ?? '',
+          'alter-egos': raw.biography['alter-egos'] ?? '',
+          aliases: raw.biography.aliases ?? [],
+          'place-of-birth': raw.biography['place-of-birth'] ?? '',
+          'first-appearance': raw.biography['first-appearance'] ?? '',
+          publisher: raw.biography.publisher ?? '',
+          alignment: raw.biography.alignment ?? '',
+        }
+      : undefined
+
+    const appearance: Appearance | undefined = raw.appearance
+      ? {
+          gender: raw.appearance.gender ?? '',
+          race: raw.appearance.race ?? '',
+          height: raw.appearance.height ?? [],
+          weight: raw.appearance.weight ?? [],
+          'eye-color': raw.appearance['eye-color'] ?? '',
+          'hair-color': raw.appearance['hair-color'] ?? '',
+        }
+      : undefined
+
+    const work: Work | undefined = raw.work
+      ? {
+          occupation: raw.work.occupation ?? '',
+          base: raw.work.base ?? '',
+        }
+      : undefined
+
+    const connections: Connections | undefined = raw.connections
+      ? {
+          'group-affiliation': raw.connections['group-affiliation'] ?? '',
+          relatives: raw.connections.relatives ?? '',
+        }
+      : undefined
+
     return {
       id: Number(raw.id) || 0,
       name,
       image: { url: imageUrl },
       powerstats,
+      biography,
+      appearance,
+      work,
+      connections,
     }
   }
 

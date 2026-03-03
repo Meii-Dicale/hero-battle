@@ -7,15 +7,22 @@
       </div>
       <div v-if="heroStore.combatLog.length" class="combat-log">
         <h2>Journal de combat</h2>
-        <ul>
-          <li v-for="(line, i) in heroStore.combatLog" :key="i">{{ line }}</li>
+        <ul class="log-list">
+          <li
+            v-for="(line, i) in heroStore.combatLog"
+            :key="i"
+            class="log-line"
+            :style="{ animationDelay: `${i}s` }"
+          >
+            {{ line }}
+          </li>
         </ul>
       </div>
       <div class="actions">
         <v-btn color="primary" variant="flat" size="large" @click="replayDuel">
           Rejouer le duel
         </v-btn>
-        <v-btn variant="outlined" @click="$router.push('/')">
+        <v-btn color="white" variant="outlined" size="large" @click="$router.push('/')">
           Retour à l'accueil
         </v-btn>
       </div>
@@ -52,7 +59,7 @@ function replayDuel() {
 }
 .loser-message {
   text-align: center;
-  color: #666;
+  color: white;
   margin-bottom: 2rem;
 }
 .combat-log {
@@ -67,12 +74,27 @@ function replayDuel() {
   font-size: 1rem;
   margin: 0 0 0.75rem;
 }
-.combat-log ul {
+.log-list {
   margin: 0;
   padding-left: 1.25rem;
+  list-style: none;
 }
-.combat-log li {
+.log-line {
   margin-bottom: 0.35rem;
+  opacity: 0;
+  animation: log-line-in 0.5s ease-out forwards;
+}
+
+/* 1 seconde de délai entre chaque apparition */
+@keyframes log-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .actions {
   display: flex;
