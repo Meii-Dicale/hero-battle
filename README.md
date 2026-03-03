@@ -1,5 +1,34 @@
 # hero-battle
 
+Projet de combat de héros (Vue 3 + Vite).
+
+## Règles de combat
+
+Les statistiques de combat sont dérivées des **powerstats** de chaque héros (intelligence, strength, speed, durability, power, combat). Les formules suivantes sont implémentées dans `src/utils/battleRules.ts` et utilisées pour les duels.
+
+| Stat | Formule | Description |
+|------|--------|-------------|
+| **HP max** | `50 + durability × 2` | Points de vie maximum en début de combat. |
+| **Attaque** | `strength + ⌊power / 2⌋` | Puissance d’attaque (dégâts potentiels). |
+| **Défense** | `⌊(durability + combat) / 2⌋` | Réduction des dégâts subis. |
+| **Vitesse** | `speed` | Initiative (ordre de jeu). |
+
+- **HP max** : base 50 + bonus basé sur la durabilité.
+- **Attaque** : force + moitié de la puissance (arrondi inférieur).
+- **Défense** : moyenne (arrondi inférieur) de durabilité et combat.
+- **Vitesse** : valeur brute de `speed` pour l’initiative.
+
+Utilisation dans le code :
+
+```ts
+import { getBattleStats } from '@/utils/battleRules'
+
+const stats = getBattleStats(hero.powerstats)
+// stats.hpMax, stats.attaque, stats.defense, stats.vitesse
+```
+
+---
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
