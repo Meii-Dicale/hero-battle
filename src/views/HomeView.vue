@@ -12,7 +12,6 @@
           v-for="hero in heroStore.heroes"
           :key="hero.id"
           class="hero-card"
-          hover
         >
           <div class="hero-card-clickable  " @click="selectedHero = hero">
             <v-card-title>
@@ -98,7 +97,7 @@ onMounted(() => {
   gap: 1rem;
   padding: 1rem 0;
 }
-/* Effet verre dépoli sur les cartes + couche GPU pour éviter bugs d'affichage au scroll */
+/* Effet verre dépoli : pas de hover Vuetify (conflit avec backdrop-filter = clignotement) */
 .hero-card {
   min-height: 0;
   background: rgba(255, 255, 255, 0.15) !important;
@@ -109,13 +108,17 @@ onMounted(() => {
     0 8px 32px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transform: translateZ(0);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .hero-card:hover {
-  background: rgba(255, 255, 255, 0.22) !important;
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.45);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+/* Désactiver le hover par défaut de Vuetify sur la carte */
+.hero-card :deep(.v-card__underlay) {
+  display: none;
 }
 .hero-card-clickable {
   cursor: pointer;

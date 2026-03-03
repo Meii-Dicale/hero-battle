@@ -41,7 +41,7 @@ defineProps<{ stats: BattleStats | null }>()
 }
 .stat-label {
   font-size: 0.7rem;
-  color: #666;
+  color: white;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

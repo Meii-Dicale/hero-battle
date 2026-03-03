@@ -92,6 +92,7 @@ function startCombat() {
   justify-content: center;
   gap: 2rem;
   padding: 1.5rem;
+  
 }
 .fighter {
   display: flex;
