@@ -1,7 +1,7 @@
 <template>
   <div class="sticky-hero-bar">
     <template v-if="!heroStore.firstHero && !heroStore.secondHero">
-      <p class="placeholder">Veuillez sélectionner votre héros</p>
+      <p class="placeholder">Veuillez sélectionner vos héros</p>
     </template>
     <template v-else>
       <div class="slot slot-first">

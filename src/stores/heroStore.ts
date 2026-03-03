@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Battle, Hero } from '../types/heroTypes'
+import { getBattleStats } from '@/utils/battleRules'
 import api from '@/service/ApiService'
 
 const PAGE_SIZE = 30
@@ -20,6 +21,7 @@ export const useHeroStore = defineStore('hero', () => {
   const draw = ref(false)
 
   const historyBattles = ref<Battle[]>([])
+  const combatLog = ref<string[]>([])
 
   const hasMore = computed(() => nextOffset.value <= TOTAL_HEROES)
 
@@ -27,7 +29,65 @@ export const useHeroStore = defineStore('hero', () => {
     const randomIndex = Math.floor(Math.random() * heroes.value.length)
     return heroes.value[randomIndex]
   }
-  const battle = async () => {}
+
+  /**
+   * Lance le combat tour par tour. Le héros avec la vitesse la plus élevée commence.
+   * En cas d'égalité, firstHero commence.
+   * Dégâts = max(1, attaque_attaquant - défense_défenseur/2).
+   * Met à jour winner, loser, combatLog et ajoute à historyBattles.
+   */
+  function runCombat() {
+    const heroA = firstHero.value
+    const heroB = secondHero.value
+    if (!heroA || !heroB) return
+
+    const statsA = getBattleStats(heroA.powerstats)
+    const statsB = getBattleStats(heroB.powerstats)
+
+    let hpA = statsA.hpMax
+    let hpB = statsB.hpMax
+    const log: string[] = []
+
+    let attackerIsA = statsB.vitesse > statsA.vitesse ? false : true
+
+    while (hpA > 0 && hpB > 0) {
+      const attaqueAtt = attackerIsA ? statsA.attaque : statsB.attaque
+      const defenseDef = attackerIsA ? statsB.defense : statsA.defense
+      const degats = Math.max(1, Math.floor(attaqueAtt - defenseDef / 2))
+
+      const nameAtt = attackerIsA ? heroA.name : heroB.name
+      const nameDef = attackerIsA ? heroB.name : heroA.name
+
+      if (attackerIsA) {
+        hpB -= degats
+        const hpRestants = Math.max(0, hpB)
+        log.push(`${nameAtt} attaque ${nameDef} et inflige ${degats} dégâts. ${nameDef} a ${hpRestants} HP restants.`)
+      } else {
+        hpA -= degats
+        const hpRestants = Math.max(0, hpA)
+        log.push(`${nameAtt} attaque ${nameDef} et inflige ${degats} dégâts. ${nameDef} a ${hpRestants} HP restants.`)
+      }
+      attackerIsA = !attackerIsA
+    }
+
+    combatLog.value = log
+    if (hpA <= 0) {
+      winner.value = heroB
+      loser.value = heroA
+    } else {
+      winner.value = heroA
+      loser.value = heroB
+    }
+    draw.value = false
+
+    historyBattles.value.push({
+      id: Date.now(),
+      winner: winner.value,
+      loser: loser.value,
+      draw: false,
+      date: new Date(),
+    })
+  }
 
   /** Charge un lot d’IDs (API : 1 à 731). */
   async function fetchHeroBatch(start: number): Promise<Hero[]> {
@@ -127,6 +187,9 @@ export const useHeroStore = defineStore('hero', () => {
     heroes,
     firstHero,
     secondHero,
+    winner,
+    loser,
+    combatLog,
     loading,
     loadingMore,
     hasMore,
@@ -139,5 +202,6 @@ export const useHeroStore = defineStore('hero', () => {
     clearFirstHero,
     clearSecondHero,
     clearHistoryBattles,
+    runCombat,
   }
 })

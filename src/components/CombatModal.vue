@@ -26,7 +26,10 @@
       </div>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" variant="flat" @click="$emit('update:modelValue', false)">
+        <v-btn color="primary" variant="flat" @click="startCombat">
+          Démarrer le combat
+        </v-btn>
+        <v-btn variant="text" @click="$emit('update:modelValue', false)">
           Fermer
         </v-btn>
       </v-card-actions>
@@ -36,13 +39,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useHeroStore } from '@/stores/heroStore'
 import { getBattleStats } from '@/utils/battleRules'
 import StatsBar from './StatsBar.vue'
 
-const props = defineProps<{ modelValue: boolean }>()
-defineEmits<{ 'update:modelValue': [value: boolean] }>()
-
+defineProps<{ modelValue: boolean }>()
+const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
+const router = useRouter()
 const heroStore = useHeroStore()
 
 const stats1 = computed(() =>
@@ -51,6 +55,12 @@ const stats1 = computed(() =>
 const stats2 = computed(() =>
   heroStore.secondHero ? getBattleStats(heroStore.secondHero.powerstats) : null
 )
+
+function startCombat() {
+  heroStore.runCombat()
+  emit('update:modelValue', false)
+  router.push('/battle')
+}
 </script>
 
 <style scoped>
