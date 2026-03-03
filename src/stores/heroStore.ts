@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Hero } from '../types/heroTypes'
+import type { Battle, Hero } from '../types/heroTypes'
 import api from '@/service/ApiService'
 
 const PAGE_SIZE = 30
@@ -18,6 +18,8 @@ export const useHeroStore = defineStore('hero', () => {
   const winner = ref<Hero | null>(null)
   const loser = ref<Hero | null>(null)
   const draw = ref(false)
+
+  const historyBattles = ref<Battle[]>([])
 
   const hasMore = computed(() => nextOffset.value <= TOTAL_HEROES)
 
@@ -117,6 +119,9 @@ export const useHeroStore = defineStore('hero', () => {
   function clearSecondHero() {
     secondHero.value = null
   }
+  function clearHistoryBattles() {
+    historyBattles.value = []
+  }
 
   return {
     heroes,
@@ -125,6 +130,7 @@ export const useHeroStore = defineStore('hero', () => {
     loading,
     loadingMore,
     hasMore,
+    historyBattles,
     getHeroes,
     loadMoreHeroes,
     getRandomHero,
@@ -132,5 +138,6 @@ export const useHeroStore = defineStore('hero', () => {
     setSecondHero,
     clearFirstHero,
     clearSecondHero,
+    clearHistoryBattles,
   }
 })

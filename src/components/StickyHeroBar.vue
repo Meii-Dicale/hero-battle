@@ -50,20 +50,27 @@
           </v-btn>
         </template>
         <p v-else class="slot-placeholder">Héros 2</p>
-        <v-btn v-if="heroStore.firstHero && heroStore.secondHero" @click="launchBattle">Lancer le combat</v-btn>
       </div>
+      <v-btn
+        v-if="heroStore.firstHero && heroStore.secondHero"
+        color="primary"
+        variant="flat"
+        @click="showCombatModal = true"
+      >
+        Lancer le combat
+      </v-btn>
     </template>
+    <CombatModal v-model="showCombatModal" />
   </div>
-  
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import CombatModal from '@/components/CombatModal.vue'
 import { useHeroStore } from '@/stores/heroStore'
 
 const heroStore = useHeroStore()
-const launchBattle = () => {
-    
-}
+const showCombatModal = ref(false)
 </script>
 
 <style scoped>

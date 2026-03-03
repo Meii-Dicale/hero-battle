@@ -2,6 +2,7 @@
 
 <template>
   <main>
+    <StatisticsBattle />
     <div v-if="heroStore.loading" class="loading">
       <p>Chargement des héros...</p>
     </div>
@@ -41,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import StatisticsBattle from '@/components/StatisticsBattle.vue'
 import StickyHeroBar from '@/components/StickyHeroBar.vue'
 import { useHeroStore } from '@/stores/heroStore'
 import { onMounted, ref, watch } from 'vue'

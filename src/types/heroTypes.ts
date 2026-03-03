@@ -14,3 +14,11 @@ export interface Powerstats {
     combat: number
 }
 
+export interface Battle {
+  id: number
+  winner: Hero
+  loser: Hero
+  draw: boolean
+  date: Date
+}
+
