@@ -4,6 +4,7 @@
   <main class="home-main">
     <StatisticsBattle />
     <div v-if="heroStore.loading" class="loading">
+      <v-progress-circular indeterminate color="white" />
       <p>Chargement des héros...</p>
     </div>
     <template v-else>
@@ -31,7 +32,7 @@
       </div>
       <div ref="sentinelRef" class="sentinel" aria-hidden="true" />
       <div v-if="heroStore.loadingMore" class="loading-more">
-        <v-progress-circular indeterminate color="primary" />
+        <v-progress-circular indeterminate color="white" />
         <span>Chargement des héros suivants...</span>
       </div>
       <p v-else-if="heroStore.heroes.length > 0 && !heroStore.hasMore" class="end-message">

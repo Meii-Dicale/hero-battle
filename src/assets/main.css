@@ -7,12 +7,17 @@ body {
   height: 100%;
 }
 
+/* Le fond d’écran est sur .app-background (div dans App.vue) pour éviter
+   qu’il disparaisse au changement de route (bug de repaint avec background-attachment: fixed sur body). */
 body {
+  background-color: #1a1a2e;
+}
+
+.app-background {
   background-image: url('./background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 #app {

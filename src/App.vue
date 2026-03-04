@@ -1,13 +1,32 @@
 
 
 <template>
-
-  <RouterView />
+  <div class="app-root">
+    <!-- Couche de fond fixe : évite le bug de repaint quand on change de page (Vue Router) -->
+    <div class="app-background" aria-hidden="true" />
+    <RouterView />
+  </div>
 </template>
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <style scoped>
+.app-root {
+  position: relative;
+  min-height: 100vh;
+  z-index: 0;
+}
+.app-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 header {
   line-height: 1.5;
   max-height: 100vh;
