@@ -8,15 +8,21 @@
       Historique
     </v-btn>
     <HistoryBattleModale v-model="showHistoryModal" />
+    <v-btn variant="flat" color="primary" size="small" @click="goToBestHeroes">Meilleurs héros</v-btn>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import HistoryBattleModale from '@/components/HistoryBattleModale.vue'
 import { useHeroStore } from '@/stores/heroStore'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const heroStore = useHeroStore()
 const showHistoryModal = ref(false)
+const goToBestHeroes = () => {
+  router.push('/best-heroes')
+}
+
 </script>
 <style scoped>
 /* Effet verre dépoli */

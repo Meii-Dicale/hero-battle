@@ -16,6 +16,30 @@ const PAGE_SIZE = 30
 /** IDs API Superhero : 1 à 731 (pas 0). */
 const TOTAL_HEROES = 731
 const FIRST_ID = 1
+const HISTORY_STORAGE_KEY = 'hero-war-history-battles'
+
+function loadHistoryFromStorage(): Battle[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_STORAGE_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as Array<Battle & { date: string }>
+    if (!Array.isArray(parsed)) return []
+    return parsed.map((b) => ({
+      ...b,
+      date: new Date(b.date),
+    })) as Battle[]
+  } catch {
+    return []
+  }
+}
+
+function saveHistoryToStorage(battles: Battle[]) {
+  try {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(battles))
+  } catch {
+    // ignore (quota, private mode, etc.)
+  }
+}
 
 export const useHeroStore = defineStore('hero', () => {
   const heroes = ref<Hero[]>([])
@@ -28,14 +52,31 @@ export const useHeroStore = defineStore('hero', () => {
   const loser = ref<Hero | null>(null)
   const draw = ref(false)
 
-  const historyBattles = ref<Battle[]>([])
+  const historyBattles = ref<Battle[]>(loadHistoryFromStorage())
   const combatLog = ref<string[]>([])
+  const loadingRandom = ref(false)
 
   const hasMore = computed(() => nextOffset.value <= TOTAL_HEROES)
 
-  const getRandomHero = async () => {
-    const randomIndex = Math.floor(Math.random() * heroes.value.length)
-    return heroes.value[randomIndex]
+  /**
+   * Récupère un héros aléatoire via l’API (id entre 1 et 731) et l’assigne au slot J1 ou J2.
+   */
+  async function getRandomHero(slot: 'first' | 'second') {
+    loadingRandom.value = true
+    try {
+      const randomId = Math.floor(Math.random() * TOTAL_HEROES) + FIRST_ID
+      const { data } = await api.get<ApiHeroResponse>(`/${randomId}`)
+      if (!data || (data as { response?: string }).response === 'error') return
+      const hero = normalizeHero(data as ApiHeroResponse)
+      if (!hero.name || !hero.image?.url) return
+      if (slot === 'first') {
+        firstHero.value = hero
+      } else {
+        secondHero.value = hero
+      }
+    } finally {
+      loadingRandom.value = false
+    }
   }
 
   function runCombat() {
@@ -89,6 +130,7 @@ export const useHeroStore = defineStore('hero', () => {
       draw: false,
       date: new Date(),
     })
+    saveHistoryToStorage(historyBattles.value)
   }
 
   /** Charge un lot d’IDs (API : 1 à 731). */
@@ -225,6 +267,7 @@ export const useHeroStore = defineStore('hero', () => {
   }
   function clearHistoryBattles() {
     historyBattles.value = []
+    saveHistoryToStorage(historyBattles.value)
   }
 
   return {
@@ -236,6 +279,7 @@ export const useHeroStore = defineStore('hero', () => {
     combatLog,
     loading,
     loadingMore,
+    loadingRandom,
     hasMore,
     historyBattles,
     getHeroes,

@@ -24,6 +24,17 @@
           >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
+          <v-btn
+            icon
+            variant="text"
+            color="green"
+            size="small"
+            :loading="heroStore.loadingRandom"
+            :disabled="heroStore.loadingRandom"
+            @click="heroStore.getRandomHero('first')"
+          >
+            <v-icon>mdi-dice-6-outline</v-icon>
+          </v-btn>
         </template>
         <p v-else class="slot-placeholder">Héros 1</p>
       </div>
@@ -47,6 +58,17 @@
             @click="heroStore.clearSecondHero()"
           >
             <v-icon>mdi-delete</v-icon>
+          </v-btn>
+          <v-btn
+            icon
+            variant="text"
+            color="green"
+            size="small"
+            :loading="heroStore.loadingRandom"
+            :disabled="heroStore.loadingRandom"
+            @click="heroStore.getRandomHero('second')"
+          >
+            <v-icon>mdi-dice-6-outline</v-icon>
           </v-btn>
         </template>
         <p v-else class="slot-placeholder">Héros 2</p>
